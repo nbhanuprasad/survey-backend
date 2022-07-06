@@ -32,7 +32,7 @@ app.get("/", (req, res) => {
 
 // routes
 require("./app/routes/auth.route")(app);
-//require("./app/routes/super-admin.routes")(app);
+require("./app/routes/user.routes")(app);
 
 // set port, listen for requests
 const PORT = process.env.PORT || 3000;
