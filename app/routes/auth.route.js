@@ -20,3 +20,5 @@ module.exports = function (app) {
   app.get("/api/auth/logout/:userId", controller.logout);
 
 };
+
+
