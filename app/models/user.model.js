@@ -9,9 +9,6 @@ module.exports = (sequelize, Sequelize) => {
     password: {
       type: Sequelize.STRING,
     },
-    jwtToken: {
-      type: Sequelize.STRING,
-    },
     userType: {
       type: Sequelize.ENUM("super-admin", "admin"),
       default: "admin",
