@@ -15,6 +15,11 @@ module.exports = function (app) {
     [authJwt.verifyToken],
     controller.createSurvey
   );
+  app.get(
+    "/api/survey/list",
+    [authJwt.verifyToken],
+    controller.surveyList
+  );
 
 
 };

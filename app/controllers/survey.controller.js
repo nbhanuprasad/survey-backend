@@ -43,3 +43,14 @@ exports.createSurvey = async (req, res) => {
   }
 
 };
+
+exports.surveyList = async(req,res) =>{
+  Survey.findAll({
+    where:{userId:req.userId}
+  }).then(surveys => {
+
+    return res.status(200).send(surveys);
+  }).catch((err)=>{
+    return res.status(500).send(err)
+  })
+}
