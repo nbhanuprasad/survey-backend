@@ -18,7 +18,9 @@ verifyToken = async (req, res, next) => {
         message: "Unauthorized!"
       });
     }
-    req.userId = decoded.id;
+    console.log("decode",decoded)
+    req.userId = decoded.id
+    req.decodeId =  decoded.deviceId
     next();
   });
 };
