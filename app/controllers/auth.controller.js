@@ -1,12 +1,12 @@
 const db = require("../models");
 const config = require("../config/secret.config");
 const User = db.user;
-const Role = db.role;
-
+const Authentication = db.authentication
 const Op = db.Sequelize.Op;
 
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
+const { authentication } = require("../models");
 
 exports.signup = (req, res) => {
 
@@ -33,7 +33,7 @@ exports.signin = (req, res) => {
       email: req.body.email
     }
   })
-    .then(user => {
+    .then(async user => {
       if (!user) {
         return res.status(404).send({ message: "No User found." });
       }
@@ -50,12 +50,23 @@ exports.signin = (req, res) => {
         });
       }
 
-      var token = jwt.sign({ id: user.id }, config.secret, {
+      var token = jwt.sign({ id: user.id,deviceId:req.body.deviceId }, config.secret, {
         expiresIn: 86400 // 24 hours
       });
+      
+      Authentication.create({
+        jwtToken:token,
+        deviceId:req.body.deviceId,
+        userId:user.id
+      })
+        .then(authentication => {
+          console.timeLog("authentication",authentication)
+        })
+        .catch(err => {
+          console.log("error")
+        return  res.status(500).send({ message: err.message });
+        });
 
-      user.jwtToken = token
-      user.save()
       res.status(200).send({
         id: user.id,
         username: user.username,

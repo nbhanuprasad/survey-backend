@@ -23,7 +23,7 @@ db.user = require("../models/user.model.js")(sequelize, Sequelize);
 db.survey = require("../models/survey.model")(sequelize, Sequelize)
 db.question = require("../models/question.model")(sequelize, Sequelize)
 db.choice = require("../models/choice.model")(sequelize, Sequelize)
-
+db.authentication = require("./authentication.model")(sequelize,Sequelize)
 //relation between user and survey
 db.user.hasMany(db.survey, {
   as: 'survey'
@@ -32,6 +32,13 @@ db.survey.belongsTo(db.user, {
   foreignKey: 'userId', as: 'user',
 });
 
+db.user.hasMany(db.authentication,{
+  as:'authentication'
+})
+
+db.authentication.belongsTo(db.user,{
+  foreignKey: 'userId', as: 'user',
+})
 //relation between survey and questions
 db.survey.hasMany(db.question, {
   as: 'question'
