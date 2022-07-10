@@ -1,4 +1,4 @@
-const { verifySignUp } = require("../middleware");
+const { verifySignUp,authJwt } = require("../middleware");
 const controller = require("../controllers/auth.controller");
 
 module.exports = function (app) {
@@ -16,8 +16,8 @@ module.exports = function (app) {
     controller.signup
   );
 
-  app.post("/api/auth/signin", controller.signin);
-  app.get("/api/auth/logout/:userId", controller.logout);
+  app.post("/api/auth/signin",verifySignUp.checkDuplicateDevice, controller.signin);
+  app.get("/api/auth/logout/:userId",authJwt.verifyToken, controller.logout);
 
 };
 

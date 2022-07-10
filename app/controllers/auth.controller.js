@@ -87,19 +87,21 @@ exports.signin = (req, res) => {
     });
 };
 
-exports.logout = (req, res) => {
+exports.logout =async (req, res) => {
   User.findOne({
     where: {
       id: req.params.userId
     }
   })
-    .then(user => {
+    .then(async user => {
       if (!user) {
         return res.status(404).send({ message: "User Not found." });
       }
-
-      user.jwtToken = null
-      user.save()
+      //remove decodeid row
+      console.log("devicdeid",req.userId,req.deviceId)
+    await  Authentication.destroy({
+        where:{deviceId:req.deviceId,userId:req.userId}
+      })
       res.status(200).send({
         message: "logout successfull"
       });
