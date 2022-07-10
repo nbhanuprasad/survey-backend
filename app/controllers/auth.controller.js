@@ -18,7 +18,13 @@ exports.signup = (req, res) => {
     userType: req.body.userType ? req.body.userType : "admin"
   })
     .then(user => {
-      res.send({ message: "User registered successfully!", user: user });
+      let user_details = {
+        id:user.dataValues.id,
+        username:user.dataValues.username,
+        email:user.dataValues.email,
+        userType:user.dataValues.userType
+      }
+      res.send({ message: "User registered successfully!", user: user_details });
     })
     .catch(err => {
       console.log("error")
