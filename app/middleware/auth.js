@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const config = require("../config/secret.config.js");
 const db = require("../models");
 const User = db.user;
-
+const Authentication = db.authentication
 verifyToken = async (req, res, next) => {
   let token = req.headers["x-access-token"];
 
@@ -12,15 +12,22 @@ verifyToken = async (req, res, next) => {
     });
   }
 
-  await jwt.verify(token, config.secret, (err, decoded) => {
+  await jwt.verify(token, config.secret, async(err, decoded) => {
     if (err) {
       return res.status(401).send({
         message: "Unauthorized!"
       });
     }
-    console.log("decode",decoded)
+    let checkTokenExists = await Authentication.findOne({
+      where:{deviceId:decoded.deviceId}
+    })
+    if(!checkTokenExists){
+      return res.status(401).send({
+        message:"token invalid..!"
+      })
+    }
     req.userId = decoded.id
-    req.decodeId =  decoded.deviceId
+    req.deviceId =  decoded.deviceId
     next();
   });
 };
