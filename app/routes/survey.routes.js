@@ -21,7 +21,7 @@ module.exports = function (app) {
     controller.surveyList
   );
 
-  app.get(
+  app.delete(
     "/api/survey/:surveyId",
     [authJwt.verifyToken],
     controller.deleteSurvey
