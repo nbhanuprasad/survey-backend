@@ -24,6 +24,7 @@ db.survey = require("../models/survey.model")(sequelize, Sequelize)
 db.question = require("../models/question.model")(sequelize, Sequelize)
 db.choice = require("../models/choice.model")(sequelize, Sequelize)
 db.authentication = require("./authentication.model")(sequelize,Sequelize)
+db.responses = require("./response.model")(sequelize,Sequelize)
 //relation between user and survey
 db.user.hasMany(db.survey, {
   as: 'survey'
@@ -55,4 +56,11 @@ db.choice.belongsTo(db.question, {
   foreignKey: 'questionId', as: 'question',
 });
 
+
+db.question.hasMany(db.responses, {
+  as: 'response'
+});
+db.responses.belongsTo(db.question, {
+  foreignKey: 'questionId', as: 'question',
+});
 module.exports = db;
