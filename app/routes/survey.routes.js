@@ -21,5 +21,11 @@ module.exports = function (app) {
     controller.surveyList
   );
 
+  app.get(
+    "/api/survey/:surveyId",
+    [authJwt.verifyToken],
+    controller.deleteSurvey
+  );
+
 
 };
