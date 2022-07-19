@@ -90,7 +90,7 @@ exports.signin = (req, res) => {
 exports.logout =async (req, res) => {
   User.findOne({
     where: {
-      id: req.params.userId
+      id: req.userId
     }
   })
     .then(async user => {
@@ -98,14 +98,12 @@ exports.logout =async (req, res) => {
         return res.status(404).send({ message: "User Not found." });
       }
       //remove decodeid row
-      console.log("devicdeid",req.userId,req.deviceId)
     await  Authentication.destroy({
         where:{deviceId:req.deviceId,userId:req.userId}
       })
       res.status(200).send({
         message: "logout successfull"
       });
-
     })
     .catch(err => {
       res.status(500).send({ message: err.message });
