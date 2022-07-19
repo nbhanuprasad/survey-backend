@@ -43,3 +43,31 @@ exports.createSurvey = async (req, res) => {
   }
 
 };
+
+exports.updateSurvey = async (req,res)=>{
+if(!req.body.title || !req.body.description){
+  return res.status(400).send({
+    message:"title and description are required"
+  })
+}
+//update survey
+Survey.update(
+  {title:req.body.title,description:req.body.description},
+  {where:{id:req.params.surveyId}}
+).then((resp)=>{
+  console.log("resp",resp)
+  if(resp == 1){
+  return res.status(200).json({
+    message:"title and description updated successfully"
+  })
+}else{
+  return res.status(200).json({
+    message:"Error Occured while updating survey details"
+  })
+}
+}).catch((err)=>{
+  return res.status(500).json({
+    message:"error updating surey detail"
+  })
+})
+}
