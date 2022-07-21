@@ -27,5 +27,10 @@ module.exports = function (app) {
     controller.deleteSurvey
   );
 
+  app.put(
+    "/api/survey/:surveyId",
+    [authJwt.verifyToken],
+    controller.updateSurvey
+  )
 
 };
