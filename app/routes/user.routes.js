@@ -10,6 +10,7 @@ module.exports = function (app) {
   });
 
   app.get("/api/superadmin/alladmins", [authJwt.verifyToken, authJwt.isSuperAdmin], controller.getAllAdmins);
+  app.put("/api/superadmin/:adminId", [authJwt.verifyToken, authJwt.isSuperAdmin], controller.deactivateAdmin);
 
  
 
