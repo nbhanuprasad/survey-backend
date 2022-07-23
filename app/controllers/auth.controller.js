@@ -112,6 +112,11 @@ exports.logout =async (req, res) => {
 
 //change password
 exports.changePassword = (req, res) => {
+  if(!req.body.oldPassword || !req.body.newPassword){
+    return res.status(400).json({
+      message:"old password and new password required"
+    })
+  }
   //finduser
   User.findOne({
     where: {
@@ -130,9 +135,10 @@ exports.changePassword = (req, res) => {
 
       if (!checkOldPassword) {
         return res.status(401).send({
-          message: "Invalid Password!"
+          message: "Old Password did not match!"
         });
       }
+
       //if password matched update it
     //update password
     user.password =await bcrypt.hashSync(req.body.newPassword, 8)
