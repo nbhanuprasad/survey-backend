@@ -94,3 +94,25 @@ exports.updateSurvey = async (req,res)=>{
     })
   })
   }
+
+  exports.viewSurvey = (req,res)=>{
+      
+    Survey.findOne({
+       where: { id: req.params.surveyId },
+       include: [
+         {
+           model: db.question, as: 'question',
+           include: [{
+             model: db.choice, as: "choice"
+           }]
+         }
+       ]
+     }) .then((surveyDetails) => {
+       
+       res.status(200).send(surveyDetails);
+     })
+     .catch((err) => {
+       console.log("error");
+       res.status(500).send({ message: err.message });
+     });
+   }
