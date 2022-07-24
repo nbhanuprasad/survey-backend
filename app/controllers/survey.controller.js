@@ -54,3 +54,25 @@ exports.surveyList = async(req,res) =>{
     return res.status(500).send(err)
   })
 }
+
+exports.viewSurvey = (req,res)=>{
+      
+  Survey.findOne({
+     where: { id: req.params.surveyId },
+     include: [
+       {
+         model: db.question, as: 'questions',
+         include: [{
+           model: db.option, as: "options"
+         }]
+       }
+     ]
+   }) .then((surveyDetails) => {
+     
+     res.status(200).send(surveyDetails);
+   })
+   .catch((err) => {
+     console.log("error");
+     res.status(500).send({ message: err.message });
+   });
+ }
