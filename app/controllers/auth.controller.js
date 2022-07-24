@@ -43,6 +43,11 @@ exports.signin = (req, res) => {
       if (!user) {
         return res.status(404).send({ message: "No User found." });
       }
+      //check user active status
+      if(!user.active){
+        return res.status(404).send({ message: "This Account has been deactivaed. Contact Superadmin for further Info" });
+
+      }
 
       var passwordIsValid = bcrypt.compareSync(
         req.body.password,
