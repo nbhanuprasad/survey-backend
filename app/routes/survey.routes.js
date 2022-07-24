@@ -21,7 +21,7 @@ module.exports = function (app) {
     controller.surveyList
   );
 
-  app.put(
+  app.get(
     "/api/survey/:surveyId",
     [authJwt.verifyToken],
     controller.viewSurvey

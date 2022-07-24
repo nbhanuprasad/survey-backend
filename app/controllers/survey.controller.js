@@ -61,9 +61,9 @@ exports.viewSurvey = (req,res)=>{
      where: { id: req.params.surveyId },
      include: [
        {
-         model: db.question, as: 'questions',
+         model: db.question, as: 'question',
          include: [{
-           model: db.option, as: "options"
+           model: db.choice, as: "choice"
          }]
        }
      ]
