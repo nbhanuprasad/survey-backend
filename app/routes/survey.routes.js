@@ -33,4 +33,10 @@ module.exports = function (app) {
     controller.updateSurvey
   )
 
+  app.get(
+    "/api/survey/:surveyId",
+    [authJwt.verifyToken],
+    controller.viewSurvey
+  );
+
 };
