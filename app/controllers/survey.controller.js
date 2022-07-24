@@ -3,6 +3,7 @@ const User = db.user
 const Survey = db.survey
 const surveyServices = require("../middleware/survey");
 const { survey } = require("../models");
+let email = require("../utils/sendEmail")
 
 exports.createSurvey = async (req, res) => {
   try {
@@ -93,4 +94,20 @@ exports.updateSurvey = async (req,res)=>{
       message:"error updating surey detail"
     })
   })
+  }
+
+  //send email
+  exports.sendEmail = async (req, res) => {
+    if (!req.body.surveyLink || !req.body.endsuserEmail) {
+      return res.status(400).send({
+        message: "email and survey link mandatory"
+      })
+    }
+    let response = await email.sendSurveyLinkEmail(req.body.endsuserEmail, req.body.surveyLink)
+    console.log("res", response)
+    if (response) {
+      return res.status(200).send("email sent succesfully")
+    } else {
+      return res.status(200).send("email not sent")
+    }
   }
