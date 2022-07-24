@@ -14,7 +14,9 @@ module.exports = (sequelize, Sequelize) => {
       default: "admin",
     },
     active:{
-      type:Sequelize.BOOLEAN
+      type:Sequelize.BOOLEAN,
+      allowNull:false,
+      defaultValue:true
     }
   });
 

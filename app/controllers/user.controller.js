@@ -49,3 +49,20 @@ exports.deactivateAdmin = (req, res) => {
   })
 
 };
+
+
+exports.viewAdmin = (req, res) => {
+  console.log("admin",req.params.adminId)
+  //find all admins
+  User.findOne({
+    where: {
+      id: req.params.adminId
+    },
+    include:[{
+      model:db.survey,as:'survey'
+    }]
+  }).then(user => {
+    return res.status(200).send(user);
+  })
+
+};
