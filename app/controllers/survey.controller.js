@@ -13,7 +13,7 @@ exports.createSurvey = async (req, res) => {
       })
     }
     //save title,description,is published in survey table
-    let surveyDetails = await surveyServices.createSurvey(req.body.title, req.body.description, false, req.userId)
+    let surveyDetails = await surveyServices.createSurvey(req.body.title, req.body.description, req.body.isPublished, req.userId)
     for (let i = 0; i < req.body.questions.length; i++) {
       switch (req.body.questions[i].question_type) {
         case "multiple-choice":
