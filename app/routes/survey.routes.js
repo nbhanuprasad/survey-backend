@@ -33,10 +33,15 @@ module.exports = function (app) {
     controller.updateSurvey
   )
 
+  app.post(
+    "/api/sendemail",
+    [authJwt.verifyToken],
+    controller.sendEmail
+    )
+
   app.get(
     "/api/survey/:surveyId",
     [authJwt.verifyToken],
     controller.viewSurvey
   );
-
 };
