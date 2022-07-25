@@ -14,7 +14,7 @@ exports.createSurvey = async (req, res) => {
       })
     }
     //save title,description,is published in survey table
-    let surveyDetails = await surveyServices.createSurvey(req.body.title, req.body.description, false, req.userId)
+    let surveyDetails = await surveyServices.createSurvey(req.body.title, req.body.description, req.body.isPublished, req.userId)
     for (let i = 0; i < req.body.questions.length; i++) {
       switch (req.body.questions[i].question_type) {
         case "multiple-choice":
@@ -96,6 +96,7 @@ exports.updateSurvey = async (req,res)=>{
   })
   }
 
+
   //send email
   exports.sendEmail = async (req, res) => {
     if (!req.body.surveyLink || !req.body.endsuserEmail) {
@@ -111,3 +112,26 @@ exports.updateSurvey = async (req,res)=>{
       return res.status(200).send("email not sent")
     }
   }
+
+  exports.viewSurvey = (req,res)=>{
+      
+    Survey.findOne({
+       where: { id: req.params.surveyId },
+       include: [
+         {
+           model: db.question, as: 'question',
+           include: [{
+             model: db.choice, as: "choice"
+           }]
+         }
+       ]
+     }) .then((surveyDetails) => {
+       
+       res.status(200).send(surveyDetails);
+     })
+     .catch((err) => {
+       console.log("error");
+       res.status(500).send({ message: err.message });
+     });
+   }
+

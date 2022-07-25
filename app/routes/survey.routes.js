@@ -37,6 +37,11 @@ module.exports = function (app) {
     "/api/sendemail",
     [authJwt.verifyToken],
     controller.sendEmail
-  );
+    )
 
+  app.get(
+    "/api/survey/:surveyId",
+    [authJwt.verifyToken],
+    controller.viewSurvey
+  );
 };
