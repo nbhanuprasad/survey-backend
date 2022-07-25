@@ -3,6 +3,7 @@ const User = db.user
 const Survey = db.survey
 const surveyServices = require("../middleware/survey");
 const { survey } = require("../models");
+let email = require("../utils/sendEmail")
 
 exports.createSurvey = async (req, res) => {
   try {
@@ -114,19 +115,45 @@ exports.updateSurvey = async (req,res)=>{
     })
   })
   }
-}
+
+
+  //send email
+  exports.sendEmail = async (req, res) => {
+    if (!req.body.surveyLink || !req.body.endsuserEmail) {
+      return res.status(400).send({
+        message: "email and survey link mandatory"
+      })
+    }
+    let response = await email.sendSurveyLinkEmail(req.body.endsuserEmail, req.body.surveyLink)
+    console.log("res", response)
+    if (response) {
+      return res.status(200).send("email sent succesfully")
+    } else {
+      return res.status(200).send("email not sent")
+    }
+  }
+
+
   exports.viewSurvey = (req,res)=>{
       
     Survey.findOne({
        where: { id: req.params.surveyId },
        include: [
-         {
-           model: db.question, as: 'question',
-           include: [{
-             model: db.choice, as: "choice"
-           }]
-         }
-       ]
+        {
+          model: db.question, as: 'question',
+          include: [
+            {
+              model: db.choice, as: "choice",
+            },
+            {
+              model: db.response, as: "response",
+              include: [{
+                model: db.endUser, as: "enduser"
+              }]
+            }
+          ]
+        }
+      ]
      }) .then((surveyDetails) => {
        
        res.status(200).send(surveyDetails);
@@ -136,3 +163,4 @@ exports.updateSurvey = async (req,res)=>{
        res.status(500).send({ message: err.message });
      });
    }
+
