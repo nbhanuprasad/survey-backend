@@ -68,6 +68,26 @@ exports.deleteSurvey = async(req,res) =>{
 }
 
 exports.updateSurvey = async (req,res)=>{
+ //publish and unpublish survey
+ if (req.query.publish == "true") {
+  let published = await Survey.update(
+    { isPublished: true },
+    { where: { id: req.params.surveyId } }
+  )
+  console.log("published")
+  return res.status(200).send({
+    message: "survey published"
+  })
+} else if (req.query.publish == "false") {
+  let unpublished = await Survey.update(
+    { isPublished: false },
+    { where: { id: req.params.surveyId } }
+  )
+  console.log("unpublished")
+  return res.status(200).send({
+    message: "survey unpublished"
+  })
+} else {
   if(!req.body.title || !req.body.description){
     return res.status(400).send({
       message:"title and description are required"
@@ -94,7 +114,7 @@ exports.updateSurvey = async (req,res)=>{
     })
   })
   }
-
+}
   exports.viewSurvey = (req,res)=>{
       
     Survey.findOne({
