@@ -118,13 +118,21 @@ exports.updateSurvey = async (req,res)=>{
     Survey.findOne({
        where: { id: req.params.surveyId },
        include: [
-         {
-           model: db.question, as: 'question',
-           include: [{
-             model: db.choice, as: "choice"
-           }]
-         }
-       ]
+        {
+          model: db.question, as: 'question',
+          include: [
+            {
+              model: db.choice, as: "choice",
+            },
+            {
+              model: db.response, as: "response",
+              include: [{
+                model: db.endUser, as: "enduser"
+              }]
+            }
+          ]
+        }
+      ]
      }) .then((surveyDetails) => {
        
        res.status(200).send(surveyDetails);
