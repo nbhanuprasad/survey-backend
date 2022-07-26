@@ -115,7 +115,7 @@ exports.updateSurvey = async (req,res)=>{
     })
   })
   }
-
+}
 
   //send email
   exports.sendEmail = async (req, res) => {
