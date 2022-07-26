@@ -1,7 +1,9 @@
 const db = require("../models");
 const Survey = db.survey;
 const Question = db.question
+const endUser = db.endUser
 const Choice = db.choice
+
 exports.createSurvey = async (title,description,isPublished,userId) => {
   try {
     //create survey
@@ -41,6 +43,39 @@ if(question.question_type === "multiple-choice"){
       return err
     }
   };
+
+
+  //check endUserDetails
+exports.duplicateResponse = async (email, surveyId) => {
+
+  // Email
+  let userFound = await endUser.findOne({
+    where: {
+      email: email, surveyId: surveyId
+    }
+  })
+  console.log(userFound)
+  if (userFound !== null) {
+    return true
+  }
+  return false
+
+
+};
+
+exports.createEndUser = async (email, name, surveyId) => {
+  try {
+    console.log("endus", email, name, surveyId)
+    let endUserr = await endUser.create({
+      name: name,
+      email: email,
+      surveyId: surveyId
+    })
+    return endUserr
+  } catch (err) {
+    return err
+  }
+};
 
 
 
