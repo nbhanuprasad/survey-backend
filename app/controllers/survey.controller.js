@@ -3,6 +3,7 @@ const User = db.user
 const Survey = db.survey
 const surveyServices = require("../middleware/survey");
 const { survey } = require("../models");
+let email = require("../utils/sendEmail")
 
 exports.createSurvey = async (req, res) => {
   try {
@@ -13,7 +14,7 @@ exports.createSurvey = async (req, res) => {
       })
     }
     //save title,description,is published in survey table
-    let surveyDetails = await surveyServices.createSurvey(req.body.title, req.body.description, false, req.userId)
+    let surveyDetails = await surveyServices.createSurvey(req.body.title, req.body.description, req.body.isPublished, req.userId)
     for (let i = 0; i < req.body.questions.length; i++) {
       switch (req.body.questions[i].question_type) {
         case "multiple-choice":
@@ -61,8 +62,111 @@ exports.deleteSurvey = async(req,res) =>{
   Survey.destroy({
     where:{id:req.params.surveyId}
   }).then(surveys => {
+    if(surveys == 0){
+          return res.status(404).send({
+              message:"cannot delete survey.survey id not found"
+            })
+    }
     return res.status(200).send("survey deleted successfully");
   }).catch((err)=>{
     return res.status(500).send(err)
   })
 }
+
+exports.updateSurvey = async (req,res)=>{
+ //publish and unpublish survey
+ if (req.query.isPublished == "true") {
+  let published = await Survey.update(
+    { isPublished: true },
+    { where: { id: req.params.surveyId } }
+  )
+  console.log("published")
+  return res.status(200).send({
+    message: "survey published"
+  })
+} else if (req.query.isPublished == "false") {
+  let unpublished = await Survey.update(
+    { isPublished: false },
+    { where: { id: req.params.surveyId } }
+  )
+  console.log("unpublished")
+  return res.status(200).send({
+    message: "survey unpublished"
+  })
+} else {
+  if(!req.body.title || !req.body.description){
+    return res.status(400).send({
+      message:"title and description are required"
+    })
+  }
+  //update survey
+  Survey.update(
+    {title:req.body.title,description:req.body.description},
+    {where:{id:req.params.surveyId}}
+  ).then((resp)=>{
+    console.log("resp",resp)
+    if(resp == 1){
+    return res.status(200).json({
+      message:"title and description updated successfully"
+    })
+  }else{
+    return res.status(200).json({
+      message:"Error Occured while updating survey details"
+    })
+  }
+  }).catch((err)=>{
+    return res.status(500).json({
+      message:"error updating surey detail"
+    })
+  })
+  }
+}
+
+  //send email
+  exports.sendEmail = async (req, res) => {
+    if (!req.body.surveyLink || !req.body.endsuserEmail) {
+      return res.status(400).send({
+        message: "email and survey link mandatory"
+      })
+    }
+    let response = await email.sendSurveyLinkEmail(req.body.endsuserEmail, req.body.surveyLink)
+    console.log("res", response)
+    if (response) {
+      return res.status(200).send("email sent succesfully")
+    } else {
+      return res.status(200).send("email not sent")
+    }
+  }
+
+
+  exports.viewSurvey = (req,res)=>{
+      
+    Survey.findOne({
+       where: { id: req.params.surveyId },
+       include: [
+        {
+          model: db.question, as: 'question',
+          include: [
+            {
+              model: db.choice, as: "choice",
+            },
+            {
+              model: db.response, as: "response",
+              include: [{
+                model: db.endUser, as: "enduser"
+              }]
+            }
+          ]
+        }
+      ]
+     }) .then((surveyDetails) => {
+       
+       res.status(200).send(surveyDetails);
+     })
+     .catch((err) => {
+       console.log("error");
+       res.status(500).send({ message: err.message });
+     });
+   }
+
+

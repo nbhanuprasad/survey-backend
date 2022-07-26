@@ -43,6 +43,11 @@ exports.signin = (req, res) => {
       if (!user) {
         return res.status(404).send({ message: "No User found." });
       }
+      //check user active status
+      if(!user.active){
+        return res.status(404).send({ message: "This Account has been deactivaed. Contact Superadmin for further Info" });
+
+      }
 
       var passwordIsValid = bcrypt.compareSync(
         req.body.password,
@@ -90,7 +95,7 @@ exports.signin = (req, res) => {
 exports.logout =async (req, res) => {
   User.findOne({
     where: {
-      id: req.params.userId
+      id: req.userId
     }
   })
     .then(async user => {
@@ -98,12 +103,53 @@ exports.logout =async (req, res) => {
         return res.status(404).send({ message: "User Not found." });
       }
       //remove decodeid row
-      console.log("devicdeid",req.userId,req.deviceId)
     await  Authentication.destroy({
         where:{deviceId:req.deviceId,userId:req.userId}
       })
       res.status(200).send({
         message: "logout successfull"
+      });
+    })
+    .catch(err => {
+      res.status(500).send({ message: err.message });
+    });
+};
+
+//change password
+exports.changePassword = (req, res) => {
+  if(!req.body.oldPassword || !req.body.newPassword){
+    return res.status(400).json({
+      message:"old password and new password required"
+    })
+  }
+  //finduser
+  User.findOne({
+    where: {
+      id: req.userId
+    }
+  })
+    .then(async user => {
+      if (!user) {
+        return res.status(404).send({ message: "No User found." });
+      }
+      //check whether user entered correct old password
+      var checkOldPassword =await bcrypt.compareSync(
+        req.body.oldPassword,
+        user.password
+      );
+
+      if (!checkOldPassword) {
+        return res.status(401).send({
+          message: "Old Password did not match!"
+        });
+      }
+
+      //if password matched update it
+    //update password
+    user.password =await bcrypt.hashSync(req.body.newPassword, 8)
+    user.save();
+      res.status(200).send({
+       message:"password update successfully"
       });
 
     })

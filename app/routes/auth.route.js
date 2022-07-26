@@ -17,7 +17,8 @@ module.exports = function (app) {
   );
 
   app.post("/api/auth/signin",verifySignUp.checkDuplicateDevice, controller.signin);
-  app.get("/api/auth/logout/:userId",authJwt.verifyToken, controller.logout);
+  app.put("/api/auth/logout",authJwt.verifyToken, controller.logout);
+  app.put("/api/auth/changepassword",authJwt.verifyToken, controller.changePassword);
 
 };
 

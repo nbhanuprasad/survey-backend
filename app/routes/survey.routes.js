@@ -27,5 +27,21 @@ module.exports = function (app) {
     controller.deleteSurvey
   );
 
+  app.put(
+    "/api/survey/:surveyId",
+    [authJwt.verifyToken],
+    controller.updateSurvey
+  )
 
+  app.post(
+    "/api/sendemail",
+    [authJwt.verifyToken],
+    controller.sendEmail
+    )
+
+  app.get(
+    "/api/survey/:surveyId",
+    [authJwt.verifyToken],
+    controller.viewSurvey
+  );
 };

@@ -13,6 +13,11 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.ENUM("super-admin", "admin"),
       default: "admin",
     },
+    active:{
+      type:Sequelize.BOOLEAN,
+      allowNull:false,
+      defaultValue:true
+    }
   });
 
   return User;
