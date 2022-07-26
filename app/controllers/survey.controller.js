@@ -61,6 +61,11 @@ exports.deleteSurvey = async(req,res) =>{
   Survey.destroy({
     where:{id:req.params.surveyId}
   }).then(surveys => {
+    if(surveys == 0){
+          return res.status(404).send({
+              message:"cannot delete survey.survey id not found"
+            })
+    }
     return res.status(200).send("survey deleted successfully");
   }).catch((err)=>{
     return res.status(500).send(err)
