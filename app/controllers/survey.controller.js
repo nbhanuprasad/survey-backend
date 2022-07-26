@@ -75,7 +75,7 @@ exports.deleteSurvey = async(req,res) =>{
 
 exports.updateSurvey = async (req,res)=>{
  //publish and unpublish survey
- if (req.query.publish == "true") {
+ if (req.query.isPublished == "true") {
   let published = await Survey.update(
     { isPublished: true },
     { where: { id: req.params.surveyId } }
@@ -84,7 +84,7 @@ exports.updateSurvey = async (req,res)=>{
   return res.status(200).send({
     message: "survey published"
   })
-} else if (req.query.publish == "false") {
+} else if (req.query.isPublished == "false") {
   let unpublished = await Survey.update(
     { isPublished: false },
     { where: { id: req.params.surveyId } }
