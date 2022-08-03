@@ -169,6 +169,24 @@ exports.updateSurvey = async (req,res)=>{
      });
    }
 
+   exports.openSurvey = (req,res)=>{
+      
+    Survey.findOne({
+       where: { id: req.query.surveyId },
+       include: [
+        {
+          model: db.question, as: 'question'
+        }
+      ]
+     }) .then((surveyDetails) => {
+       
+       res.status(200).send(surveyDetails);
+     })
+     .catch((err) => {
+       console.log("error");
+       res.status(500).send({ message: err.message });
+     });
+   }
 
    exports.generateSurveyReport = async (req, res) => {
     let survey_reports = []
