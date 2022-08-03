@@ -36,7 +36,8 @@ exports.surveyResponse = async (req, res) => {
       await Response.create({
         response: req.body.responses[i].response,
         enduserId: EndUser.dataValues.id,
-        questionId: req.body.responses[i].questionId
+        questionId: req.body.responses[i].id,
+        surveyId:req.query.surveyId
       })
     }
 

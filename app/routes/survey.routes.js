@@ -44,4 +44,7 @@ module.exports = function (app) {
     [authJwt.verifyToken],
     controller.viewSurvey
   );
+
+    app.get("/api/download", [authJwt.verifyToken], controller.generateSurveyReport);
+
 };
