@@ -160,7 +160,39 @@ exports.updateSurvey = async (req,res)=>{
         }
       ]
      }) .then((surveyDetails) => {
-       
+      for (let i = 0; i < surveyDetails.dataValues.question.length; i++) {
+        if (surveyDetails.dataValues.question[i].questionType == "multiple-choice") {
+          for (
+            let j = 0;
+            j < surveyDetails.dataValues.question[i].choice.length;
+            j++
+          ) {
+            for (
+              let k = 0;
+              k < survey.dataValues.question[i].response.length;
+              k++
+            ) {
+              if (
+                survey.dataValues.question[i].choice[j].choice ==
+                survey.dataValues.question[i].response[k].response
+              ) {             
+                if (
+                  survey.dataValues.question[i].choice[j].dataValues
+                    .count
+                ) {
+                  survey.dataValues.question[i].choice[j].dataValues
+                    .count++;
+                } else {
+  
+                  survey.dataValues.question[i].choice[
+                    j
+                  ].dataValues.count = 1;
+                }
+              }
+            }
+          }
+        }
+      }
        res.status(200).send(surveyDetails);
      })
      .catch((err) => {
