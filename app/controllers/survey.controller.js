@@ -4,7 +4,7 @@ const Survey = db.survey
 const surveyServices = require("../middleware/survey");
 const { survey } = require("../models");
 let email = require("../utils/sendEmail")
-
+let Response = db.response
 exports.createSurvey = async (req, res) => {
   try {
     //check title and description coming in body or not
@@ -170,3 +170,43 @@ exports.updateSurvey = async (req,res)=>{
    }
 
 
+   exports.generateSurveyReport = async (req, res) => {
+    let survey_reports = []
+    let survey_responses = await Response.findAll({
+      where: { surveyId: req.query.surveyId },
+      include: ["question", "enduser"],
+    })
+    for (let i = 0; i < survey_responses.length; i++) {
+      if (survey_reports.length == 0) {
+        let object ={
+          'user email':survey_responses[i].enduser.email,
+          'user name':survey_responses[i].enduser.name
+        }
+        survey_reports.push( object )
+      } else {
+        email_found = false
+        for (let j = 0; j < survey_reports.length; j++) {
+          if (survey_responses[i].enduser.email == survey_reports[j]['user email']) {
+            email_found = true
+          }
+        }
+        if (!email_found) {
+          let object ={
+            'user email':survey_responses[i].enduser.email,
+            'user name':survey_responses[i].enduser.name
+          }
+          survey_reports.push(object)
+        }
+      }
+    }
+    for (let i = 0; i < survey_responses.length; i++) {
+    
+      for (let j = 0; j < survey_reports.length; j++) {
+        if (survey_responses[i].enduser.email == survey_reports[j]["user email"]) {
+          let question = survey_responses[i].question.title
+          survey_reports[j][question] = survey_responses[i].response
+        }
+      }
+    }
+    return res.status(200).send(survey_reports);
+  };
