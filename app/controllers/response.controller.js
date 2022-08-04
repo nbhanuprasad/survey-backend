@@ -7,7 +7,7 @@ exports.surveyResponse = async (req, res) => {
   try {
     //check survey publish status
     let surveyStatus = await Survey.findOne({
-      where: { id: req.query.surveyId }
+      where: { id: req.body.surveyId }
     })
     if (!surveyStatus.dataValues.isPublished) {
       return res.status(400).json({
@@ -22,7 +22,7 @@ exports.surveyResponse = async (req, res) => {
     }
     console.log("req", req.body.email)
     //check duplicate response
-    let checkenduser = await surveyServices.duplicateResponse(req.body.email, req.query.surveyId)
+    let checkenduser = await surveyServices.duplicateResponse(req.body.email, req.body.surveyId)
     //if response already exists with mail id
     console.log("checkend", checkenduser)
     if (checkenduser) {
@@ -31,13 +31,13 @@ exports.surveyResponse = async (req, res) => {
       });
     }
     //save email,usernamein response table
-    let EndUser = await surveyServices.createEndUser(req.body.email, req.body.name, req.query.surveyId)
+    let EndUser = await surveyServices.createEndUser(req.body.email, req.body.name, req.body.surveyId)
     for (let i = 0; i < req.body.responses.length; i++) {
       await Response.create({
         response: req.body.responses[i].response,
         enduserId: EndUser.dataValues.id,
         questionId: req.body.responses[i].id,
-        surveyId:req.query.surveyId
+        surveyId:req.body.surveyId
       })
     }
 
