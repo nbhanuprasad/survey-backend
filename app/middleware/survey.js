@@ -32,10 +32,17 @@ exports.createQuestion = async (question,surveyId) => {
       console.log("question info",questionInfo)
 if(question.question_type === "multiple-choice"){
     for(let i=0;i<question.options.length;i++){
+      if(question.options[i].option!==''){
     await Choice.create({
         choice:question.options[i].option,
         questionId:questionInfo.dataValues.id
     })
+  }else if(question.options[i].choice!==''){
+    await Choice.create({
+      choice:question.options[i].choice,
+      questionId:questionInfo.dataValues.id
+  })
+  }
     }
 }
 
