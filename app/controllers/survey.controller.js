@@ -2,7 +2,7 @@ const db = require("../models");
 const User = db.user
 const Survey = db.survey
 const surveyServices = require("../middleware/survey");
-const { survey } = require("../models");
+const { survey, user } = require("../models");
 let email = require("../utils/sendEmail")
 let Response = db.response
 let Question = db.question
@@ -220,7 +220,60 @@ exports.updateSurvey = async (req,res)=>{
         }
       ]
      }) .then((surveyDetails) => {
-       
+      for (let i = 0; i < surveyDetails.dataValues.question.length; i++) {
+        if (surveyDetails.dataValues.question[i].questionType == "multiple-choice") {
+          for (
+            let j = 0;
+            j < surveyDetails.dataValues.question[i].choice.length;
+            j++
+          ) {
+            for (
+              let k = 0;
+              k < surveyDetails.dataValues.question[i].response.length;
+              k++
+            ) {
+              if (
+                surveyDetails.dataValues.question[i].choice[j].choice ==
+                surveyDetails.dataValues.question[i].response[k].response
+              ) {
+                if (
+                  surveyDetails.dataValues.question[i].choice[j].dataValues
+                    .count
+                ) {
+                  surveyDetails.dataValues.question[i].choice[j].dataValues
+                    .count++;
+                } else {
+                 
+  
+                  surveyDetails.dataValues.question[i].choice[
+                    j
+                  ].dataValues.count = 1;
+                }
+              }
+            }
+          }
+        }else if(surveyDetails.dataValues.question[i].questionType == "rating"){
+          let userRatings = [{key:1,count:0},{key:2,count:0},{key:3,count:0},{key:4,count:0},{key:5,count:0}]
+          for(let j=0;j<surveyDetails.dataValues.question[i].response.length;j++){
+            console.log(typeof(surveyDetails.dataValues.question[i].response[j].dataValues.response))
+            if(surveyDetails.dataValues.question[i].response[j].dataValues.response == "1"){
+              userRatings[0].count++
+            }else if(surveyDetails.dataValues.question[i].response[j].dataValues.response == "2"){
+              userRatings[1].count++
+            }else if(surveyDetails.dataValues.question[i].response[j].dataValues.response =="3"){
+              userRatings[2].count++
+            }else if(surveyDetails.dataValues.question[i].response[j].dataValues.response == "4"){
+              console.log(userRatings[3])
+userRatings[3].count++
+            }else {
+userRatings[4].count++
+            }
+          }
+         console.log(";;",userRatings)
+         surveyDetails.dataValues.question[i].dataValues.userRatings = userRatings
+
+        }
+      }
        res.status(200).send(surveyDetails);
      })
      .catch((err) => {
