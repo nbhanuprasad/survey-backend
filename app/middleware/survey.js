@@ -89,10 +89,18 @@ exports.updateQuestion = async (question_info, existing_question) => {
     let new_choices = [];
     if (existing_question.dataValues.choice.length == 0) {
       for (let i = 0; i < question_info.choices.length; i++) {
-        await Choice.create({
-          choice: question_info.choices[i].choice,
-          questionId: existing_question.dataValues.id,
-        });
+        if(question_info.choices[i].choice!==''){
+          await Choice.create({
+            choice: question_info.choices[i].choice,
+            questionId: existing_question.dataValues.id,
+          })
+        }else{
+          await Choice.create({
+            choice: question_info.choices[i].option,
+            questionId: existing_question.dataValues.id,
+          })
+        }
+    
       }
     } else {
       for (let i = 0; i < existing_question.dataValues.choice.length; i++) {
