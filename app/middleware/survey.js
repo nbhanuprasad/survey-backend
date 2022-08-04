@@ -88,9 +88,9 @@ exports.updateQuestion = async (question_info, existing_question) => {
   if (question_info.question_type == "multiple-choice") {
     let new_choices = [];
     if (existing_question.dataValues.choice.length == 0) {
-      for (let i = 0; i < question_info.choices.length; i++) {
+      for (let i = 0; i < question_info.options.length; i++) {
         await Choice.create({
-          choice: question_info.choices[i].choice,
+          choice: question_info.options[i].choice,
           questionId: existing_question.dataValues.id,
         });
       }
