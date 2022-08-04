@@ -235,11 +235,20 @@ exports.updateSurvey = async (req,res)=>{
        where: { id: req.query.surveyId },
        include: [
         {
-          model: db.question, as: 'question'
+          model: db.question, as: 'question',
+          include: [
+            {
+              model: db.choice, as: "choice",
+            },
+          ]
         }
       ]
      }) .then((surveyDetails) => {
-       
+      if (!surveyDetails.dataValues.isPublished || !surveyDetails) {
+        return res.status(404).send({
+          message: "survey dont exist"
+        })
+      }
        res.status(200).send(surveyDetails);
      })
      .catch((err) => {
