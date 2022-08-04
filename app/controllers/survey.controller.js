@@ -5,6 +5,8 @@ const surveyServices = require("../middleware/survey");
 const { survey } = require("../models");
 let email = require("../utils/sendEmail")
 let Response = db.response
+let Question = db.question
+
 exports.createSurvey = async (req, res) => {
   try {
     //check title and description coming in body or not
@@ -94,31 +96,89 @@ exports.updateSurvey = async (req,res)=>{
     message: "survey unpublished"
   })
 } else {
-  if(!req.body.title || !req.body.description){
-    return res.status(400).send({
-      message:"title and description are required"
-    })
-  }
-  //update survey
-  Survey.update(
-    {title:req.body.title,description:req.body.description},
-    {where:{id:req.params.surveyId}}
-  ).then((resp)=>{
-    console.log("resp",resp)
-    if(resp == 1){
-    return res.status(200).json({
-      message:"title and description updated successfully"
-    })
-  }else{
-    return res.status(200).json({
-      message:"Error Occured while updating survey details"
-    })
-  }
-  }).catch((err)=>{
-    return res.status(500).json({
-      message:"error updating surey detail"
-    })
-  })
+  await Survey.findOne({
+    where: { id: req.params.surveyId },
+    include: [
+      {
+        model: db.question,
+        as: "question",
+        include: [
+          {
+            model: db.choice,
+            as: "choice",
+          },
+        ],
+      },
+    ],
+  }).then(async (survey) => {
+    console.log("survey", survey.dataValues);
+    survey.title = req.body.title;
+    survey.description = req.body.description;
+    survey.isPublished = req.body.isPublished;
+    let newQuestionsArray = [];
+    if (survey.dataValues.question.length == 0) {
+      for (let i = 0; i < req.body.questions.length; i++) {
+        if (newQuestionsArray.length == 0) {
+          newQuestionsArray.push(req.body.questions[i]);
+        } else {
+          for (let k = 0; k < newQuestionsArray.length; k++) {
+            if (newQuestionsArray[k].title !== req.body.questions[i].title) {
+              newQuestionsArray.push(req.body.questions[i]);
+            }
+          }
+        }
+      }
+    } else {
+      for (let i = 0; i < survey.dataValues.question.length; i++) {
+        var questionFound = false;
+        for (j = 0; j < req.body.questions.length; j++) {
+          console.log("new questions", req.body.questions[j].id)
+          if (req.body.questions[j].id == undefined) {
+            questionFound = true
+            console.log("new question camea")
+            if (newQuestionsArray.length == 0) {
+              newQuestionsArray.push(req.body.questions[j]);
+            } else {
+              let newquestionExists = false
+              for (let k = 0; k < newQuestionsArray.length; k++) {
+                if (newQuestionsArray[k].title == req.body.questions[j].title) {
+                  newquestionExists = true
+                }
+
+              }
+              if (!newquestionExists) {
+                newQuestionsArray.push(req.body.questions[i]);
+              }
+            }
+          } else {
+            if (survey.dataValues.question[i].id == req.body.questions[j].id) {
+              console.log("found");
+              questionFound = true;
+              let questionUpdate = await surveyServices.updateQuestion(
+                req.body.questions[j],
+                survey.dataValues.question[i]
+              );
+            }
+          }
+        }
+        if (!questionFound) {
+          //delete question
+          await Question.destroy({
+            where: { id: survey.dataValues.question[i].id },
+          });
+        }
+      }
+    }
+    console.log("newQuestins", newQuestionsArray);
+
+    for (let n = 0; n < newQuestionsArray.length; n++) {
+      await surveyServices.createQuestion(newQuestionsArray[n], survey.dataValues.id);
+    }
+    survey.save();
+    return res.status(200).send({
+      message: "survey updated successfully",
+    });
+  });
   }
 }
 
